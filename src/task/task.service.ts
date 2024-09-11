@@ -38,13 +38,13 @@ export class TasksService {
 	}
 
 	async getAllTasks(): Promise<Task[]> {
-		return this.taskRepository.find({ relations: ["status"] })
+		return this.taskRepository.find({ relations: ["priority"] })
 	}
 
 	async getTaskById(id: number): Promise<Task> {
 		const task = await this.taskRepository.findOne({
 			where: { id },
-			relations: ["status"]
+			relations: ["priority"]
 		})
 
 		if (!task) {
