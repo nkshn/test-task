@@ -12,7 +12,7 @@ export class TasksService {
 		@InjectRepository(Task)
 		private readonly taskRepository: Repository<Task>,
 
-		@InjectRepository(TaskPriorityStatus) // Inject TaskPriorityStatus repository correctly
+		@InjectRepository(TaskPriorityStatus)
 		private readonly taskPriorityStatusRepository: Repository<TaskPriorityStatus>
 	) {}
 
