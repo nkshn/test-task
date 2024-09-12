@@ -5,8 +5,11 @@ import {
 	Get,
 	Param,
 	Patch,
-	Post
+	Post,
+	Query
 } from "@nestjs/common"
+import { SortOrder } from "../common/enums/sort-order.enum"
+import { SortOrderPipe } from "../common/pipes/sort-order.pipe"
 import { CreateTaskDto } from "./dto/create-task.dto"
 import { UpdateTaskDto } from "./dto/update-task.dto"
 import { Task } from "./task.entity"
@@ -24,6 +27,15 @@ export class TasksController {
 	@Get()
 	async getAllTasks(): Promise<Task[]> {
 		return this.tasksService.getAllTasks()
+	}
+
+	@Get("sorted")
+	async getAllSortedTasks(
+		@Query("sortByPriority", new SortOrderPipe(SortOrder.DESC))
+		sortByPriority: SortOrder,
+		@Query("sortByDate", new SortOrderPipe(SortOrder.ASC)) sortByDate: SortOrder
+	): Promise<Task[]> {
+		return this.tasksService.getAllSortedTasks(sortByPriority, sortByDate)
 	}
 
 	@Get(":id")

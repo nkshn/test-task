@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
+import { SortOrder } from "../common/enums/sort-order.enum"
 import { TaskPriorityStatus } from "../task-priority-status/task-priority-status.entity"
 import { CreateTaskDto } from "./dto/create-task.dto"
 import { UpdateTaskDto } from "./dto/update-task.dto"
@@ -40,6 +41,18 @@ export class TasksService {
 
 	async getAllTasks(): Promise<Task[]> {
 		return this.taskRepository.find({ relations: ["priority"] })
+	}
+
+	async getAllSortedTasks(
+		sortByPriority: SortOrder = SortOrder.DESC,
+		sortByDate: SortOrder = SortOrder.ASC
+	): Promise<Task[]> {
+		return this.taskRepository
+			.createQueryBuilder("task")
+			.leftJoinAndSelect("task.priority", "priority")
+			.orderBy("priority.priority", sortByPriority)
+			.addOrderBy("task.dueDate", sortByDate)
+			.getMany()
 	}
 
 	async getTaskById(id: number): Promise<Task> {
