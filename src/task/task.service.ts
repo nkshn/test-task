@@ -22,7 +22,8 @@ export class TasksService {
 		const priority = await this.taskPriorityStatusRepository.findOne({
 			where: { id: priorityId }
 		})
-		if (!status) {
+
+		if (!priority) {
 			throw new NotFoundException(
 				`Priority status with ID ${priorityId} not found`
 			)
@@ -75,10 +76,13 @@ export class TasksService {
 			task.priority = status
 		}
 
-		return this.taskRepository.save({
+		const updatedTask = {
 			...task,
-			...updateTaskDto
-		})
+			title: updateTaskDto.title || task.title,
+			dueDate: new Date(updateTaskDto.dueDate || task.dueDate).toISOString()
+		}
+
+		return this.taskRepository.save(updatedTask)
 	}
 
 	async deleteTask(id: number): Promise<void> {
