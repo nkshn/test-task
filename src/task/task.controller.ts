@@ -132,7 +132,7 @@ export class TasksController {
 		}
 
 		const tasks = await this.tasksService.getAllTasks()
-		await this.redisCacheService.set(cacheKey, tasks, 600000)
+		await this.redisCacheService.set(cacheKey, tasks, 60000)
 
 		return tasks
 	}
@@ -204,7 +204,7 @@ export class TasksController {
 			sortByDate
 		)
 
-		await this.redisCacheService.set(cacheKey, sortedTasks, 600000) // 60000
+		await this.redisCacheService.set(cacheKey, sortedTasks, 60000) // 60000
 
 		return sortedTasks
 	}
@@ -243,7 +243,7 @@ export class TasksController {
 		}
 
 		const task = await this.tasksService.getTaskById(id)
-		await this.redisCacheService.set(cacheKey, task, 600000)
+		await this.redisCacheService.set(cacheKey, task, 60000)
 
 		return task
 	}
