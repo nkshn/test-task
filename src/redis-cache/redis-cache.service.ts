@@ -21,6 +21,12 @@ export class RedisCacheService {
 		return value
 	}
 
+	// Get the all cached keys by specific key pattern
+	async getKeysByPattern(pattern: string): Promise<string[] | string> {
+		this.logger.log(`Get from cache all keys by this patter: ${pattern}`)
+		return this.cacheManager.store.keys(pattern)
+	}
+
 	// Set value in cache with optional TTL (time to live)
 	async set(key: string, value: any, ttl: number): Promise<void> {
 		this.logger.log(
@@ -33,6 +39,21 @@ export class RedisCacheService {
 	async del(key: string): Promise<void> {
 		this.logger.log(`Deleting cache for key: ${key}`)
 		await this.cacheManager.del(key)
+	}
+
+	// Delete all keys by pattern
+	async delKeysByPattern(pattern: string): Promise<void> {
+		const keys = await this.getKeysByPattern(pattern)
+
+		if (keys.length > 0) {
+			this.logger.log(`Deleting keys with pattern: ${pattern}`)
+
+			for (const key of keys) {
+				await this.del(key)
+			}
+		} else {
+			this.logger.warn(`No keys found for pattern: ${pattern}`)
+		}
 	}
 
 	// Reset the entire cache

@@ -98,7 +98,7 @@ export class TasksService {
 		return this.taskRepository.save(updatedTask)
 	}
 
-	async deleteTask(id: number): Promise<void> {
+	async deleteTask(id: number): Promise<boolean> {
 		const task = await this.taskRepository.findOne({ where: { id } })
 
 		if (!task) {
@@ -110,5 +110,7 @@ export class TasksService {
 		if (result.affected === 0) {
 			throw new NotFoundException(`Task with ID ${id} not found`)
 		}
+
+		return true
 	}
 }

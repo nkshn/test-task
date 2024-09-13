@@ -3,6 +3,7 @@ import {
 	Controller,
 	Delete,
 	Get,
+	Logger,
 	Param,
 	Patch,
 	Post,
@@ -27,6 +28,8 @@ import { TasksService } from "./task.service"
 @ApiTags("Tasks")
 @Controller("tasks")
 export class TasksController {
+	private readonly logger = new Logger(TasksService.name)
+
 	constructor(
 		private readonly tasksService: TasksService,
 		private readonly redisCacheService: RedisCacheService
@@ -61,7 +64,25 @@ export class TasksController {
 		}
 	})
 	async createTask(@Body() createTaskDto: CreateTaskDto): Promise<Task> {
-		return this.tasksService.createTask(createTaskDto)
+		const newTask = await this.tasksService.createTask(createTaskDto)
+
+		if (newTask) {
+			try {
+				// Invalidate multiple cache keys in parallel using Promise.all
+				await Promise.all([
+					this.redisCacheService.delKeysByPattern("*all_tasks*")
+				])
+
+				this.logger.log("Cache successfully invalidated after task creation")
+			} catch (error) {
+				this.logger.warn(
+					"Failed to invalidate cache after task creation",
+					error
+				)
+			}
+		}
+
+		return newTask
 	}
 
 	@Get()
@@ -111,7 +132,7 @@ export class TasksController {
 		}
 
 		const tasks = await this.tasksService.getAllTasks()
-		await this.redisCacheService.set(cacheKey, tasks, 60000)
+		await this.redisCacheService.set(cacheKey, tasks, 600000)
 
 		return tasks
 	}
@@ -182,7 +203,8 @@ export class TasksController {
 			sortByPriority,
 			sortByDate
 		)
-		await this.redisCacheService.set(cacheKey, sortedTasks, 60000)
+
+		await this.redisCacheService.set(cacheKey, sortedTasks, 600000) // 60000
 
 		return sortedTasks
 	}
@@ -221,7 +243,7 @@ export class TasksController {
 		}
 
 		const task = await this.tasksService.getTaskById(id)
-		await this.redisCacheService.set(cacheKey, task, 60000)
+		await this.redisCacheService.set(cacheKey, task, 600000)
 
 		return task
 	}
@@ -255,7 +277,27 @@ export class TasksController {
 		@Param("id") id: number,
 		@Body() updateTaskDto: UpdateTaskDto
 	): Promise<Task> {
-		return this.tasksService.updateTask(id, updateTaskDto)
+		const updatedTask = await this.tasksService.updateTask(id, updateTaskDto)
+
+		if (updatedTask) {
+			try {
+				await Promise.all([
+					this.redisCacheService.delKeysByPattern("*all_tasks*"),
+					this.redisCacheService.del(`task_${id}`)
+				])
+
+				this.logger.log(
+					`Cache successfully invalidated after task update for task ID: ${id}`
+				)
+			} catch (error) {
+				this.logger.warn(
+					`Failed to invalidate cache after task update for task ID: ${id}`,
+					error
+				)
+			}
+		}
+
+		return updatedTask
 	}
 
 	@Delete(":id")
@@ -270,6 +312,24 @@ export class TasksController {
 		description: "Task with ID 1 not found"
 	})
 	async deleteTask(@Param("id") id: number): Promise<void> {
-		return this.tasksService.deleteTask(id)
+		const deleteResult = await this.tasksService.deleteTask(id)
+
+		if (deleteResult) {
+			try {
+				await Promise.all([
+					this.redisCacheService.delKeysByPattern("*all_tasks*"),
+					this.redisCacheService.del(`task_${id}`)
+				])
+
+				this.logger.log(
+					`Cache successfully invalidated after task deletion for task ID: ${id}`
+				)
+			} catch (error) {
+				this.logger.warn(
+					`Failed to invalidate cache after task deletion for task ID: ${id}`,
+					error
+				)
+			}
+		}
 	}
 }
