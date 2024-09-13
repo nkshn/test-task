@@ -1,73 +1,114 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Test Task for SDA
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+This is my implementation of the test task provided by SDA, showcasing my skills in building a full-stack REST API with caching, logging, testing, and more.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+### Technologies
 
-## Description
+The project leverages the following technologies:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **TypeScript** – A typed superset of JavaScript that scales.
+- **NestJS** – A progressive Node.js framework for building efficient, reliable, and scalable server-side applications.
+- **TypeORM** – A powerful ORM framework for TypeScript and JavaScript (ES7, ES6) that supports PostgreSQL.
+- **PostgreSQL** – A powerful, open-source object-relational database system.
+- **Redis** – An in-memory data structure store, used as a distributed, in-memory key–value database, cache, and message broker.
+- **Swagger** – An open-source tool for designing, building, documenting, and consuming RESTful web services.
+- **Docker** – A platform to develop, ship, and run applications in isolated containers.
+- **Jest** – A JavaScript testing framework designed to ensure the correctness of any JavaScript codebase.
 
-## Installation
+### Features
 
-```bash
-$ npm install
+- [x] **REST API**
+  - [x] CRUD operations for **Tasks**
+    - [x] Customizing the sorting for getting all **Tasks**
+  - [x] CRUD operations for **Task Priority Status**
+
+- [x] **Caching** – Efficient caching for task retrieval using Redis.
+- [x] **Logger** – Logs requests, cache hits/misses, and errors.
+- [x] **API Documentation** – Swagger integrated for easy API exploration.
+- [x] **Unit Tests** – Comprehensive unit tests using Jest.
+- [x] **End-to-End Tests** – E2E tests covering all major workflows.
+- [x] **Database Seeder** – Seeder for pre-populating the database with initial data.
+
+### How to run the API
+
+Follow these steps to run the application:
+
+**1. Create .env file**
+
+Create a .env file in the project root and add the following configuration:
+
+```
+NODE_ENV="development"
+
+# database configuration
+DATABASE_HOST=postgres-db
+DATABASE_PORT=5432
+DATABASE_USERNAME=postgres
+DATABASE_PASSWORD=your-password
+DATABASE_NAME=test_task_for_sda
+
+# redis configuration
+REDIS_NAME=redisdb_for_sda_test_task
+REDIS_HOST=redis
+REDIS_PORT=6379
+REDIS_TTL=60000 # 60 seconds
 ```
 
-## Running the app
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+**2. Build and Run the Docker Containers**
+Use Docker Compose to build and run the app in a containerized environment:
+```sh
+docker-compose up --build
 ```
 
-## Test
+**3. Verify the Containers are Running**
+Once Docker finishes building, check that all containers (PostgreSQL, Redis, NestJS) are up and running
 
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+```sh
+docker ps
 ```
 
-## Support
+**4. Access the API and Documentation**
+- **Base API URL**: http://localhost:3000/api
+- **Swagger API Documentation**: You can explore the available API endpoints and try out requests through the integrated Swagger interface: http://localhost:3000/docs
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## How to Test the API
 
-## Stay in touch
+The following commands will help you run the tests for the application:
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+**1. Unit Tests**
 
-## License
+Run the unit tests to ensure individual components are functioning as expected:
 
-Nest is [MIT licensed](LICENSE).
+```bash
+npm run test
+```
+
+**2. End-to-End (E2E) Tests**
+
+Run the end-to-end tests to simulate user workflows:
+
+```bash
+npm run test:e2e
+```
+
+**3. Test Coverage**
+
+Generate a test coverage report to assess how much of your codebase is covered by tests:
+
+```bash
+npm run test:cov
+```
+
+### Seeding the Database
+
+Before running the API, the database should be seeded with initial data. This is automatically handled when you run the app using Docker. However, if you need to seed manually, run the following command inside your Docker container:
+
+```bash
+npm run seed
+```
+
+### Closing Remarks
+
+Thank you for the opportunity to work on this task. It was a great experience building this application with real-world features like caching, logging, and testing.
+
+> P.S. Looking forward to your review and feedback! ;)
