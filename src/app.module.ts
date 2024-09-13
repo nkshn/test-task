@@ -1,8 +1,9 @@
 import { CacheModule } from "@nestjs/cache-manager"
-import { Module } from "@nestjs/common"
+import { Logger, Module } from "@nestjs/common"
 import { ConfigModule } from "@nestjs/config"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import { redisStore } from "cache-manager-redis-yet"
+import { RedisCacheModule } from "./redis-cache/redis-cache.module"
 import { TaskPriorityStatus } from "./task-priority-status/task-priority-status.entity"
 import { TaskPriorityStatusModule } from "./task-priority-status/task-priority-status.module"
 import { Task } from "./task/task.entity"
@@ -26,19 +27,33 @@ import { TaskModule } from "./task/task.module"
 		}),
 		CacheModule.registerAsync({
 			isGlobal: true,
-			useFactory: async () => ({
-				store: await redisStore({
-					socket: {
-						host: process.env.REDIS_HOST,
-						port: parseInt(process.env.REDIS_PORT, 10)
-					},
-					name: process.env.REDIS_NAME,
-					ttl: parseInt(process.env.REDIS_TTL, 10) || 30000
-				})
-			})
+			useFactory: async () => {
+				const logger = new Logger("RedisCacheDB")
+
+				try {
+					const store = await redisStore({
+						socket: {
+							host: process.env.REDIS_HOST,
+							port: parseInt(process.env.REDIS_PORT, 10)
+						},
+						name: process.env.REDIS_NAME,
+						ttl: parseInt(process.env.REDIS_TTL, 10) || 60000
+					})
+
+					logger.log("Redis connected successfully")
+
+					return {
+						store
+					}
+				} catch (err) {
+					logger.error("Redis connection failed", err)
+					throw new Error("Failed to connect to Redis")
+				}
+			}
 		}),
 		TaskPriorityStatusModule,
-		TaskModule
+		TaskModule,
+		RedisCacheModule
 	]
 })
 export class AppModule {}

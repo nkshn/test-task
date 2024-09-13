@@ -1,13 +1,14 @@
 import { Module } from "@nestjs/common"
-import { TasksService } from "./task.service"
-import { TasksController } from "./task.controller"
 import { TypeOrmModule } from "@nestjs/typeorm"
-import { Task } from "./task.entity"
+import { RedisCacheService } from "../redis-cache/redis-cache.service"
 import { TaskPriorityStatusModule } from "../task-priority-status/task-priority-status.module" // Import TaskPriorityStatusModule
+import { TasksController } from "./task.controller"
+import { Task } from "./task.entity"
+import { TasksService } from "./task.service"
 
 @Module({
 	imports: [TypeOrmModule.forFeature([Task]), TaskPriorityStatusModule],
-	providers: [TasksService],
+	providers: [TasksService, RedisCacheService],
 	controllers: [TasksController]
 })
 export class TaskModule {}
