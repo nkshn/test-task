@@ -3,11 +3,24 @@ import { NestFactory } from "@nestjs/core"
 import { AppModule } from "./app.module"
 import { AllExceptionsFilter } from "./common/filters/all-exceptions.filter"
 import { LoggingInterceptor } from "./common/interceptors/logging.interceptor"
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger"
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule, {
 		logger: ["log", "error", "warn", "debug", "verbose"]
 	})
+
+	const options = new DocumentBuilder()
+		.setTitle("SDA Tesk Task API Documentation")
+		.setDescription("This is my API documentation for SDA test tasks.")
+		.setVersion("1.0")
+		.addServer("http://localhost:3000/", "Local environment")
+		.addTag("Tasks")
+		.addTag("Task Priority Status")
+		.build()
+
+	const document = SwaggerModule.createDocument(app, options)
+	SwaggerModule.setup("docs", app, document)
 
 	app.useGlobalInterceptors(new LoggingInterceptor())
 	app.useGlobalFilters(new AllExceptionsFilter())
