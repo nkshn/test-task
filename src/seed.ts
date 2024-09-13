@@ -6,6 +6,15 @@ import CreateTasks from "./seeds/task.seed"
 import { TaskPriorityStatus } from "./task-priority-status/task-priority-status.entity"
 import { Task } from "./task/task.entity"
 
+// Load environment variables based on the NODE_ENV value
+if (process.env.NODE_ENV === "test") {
+	dotenv.config({ path: ".env.test.local" })
+} else if (process.env.NODE_ENV === "production") {
+	dotenv.config({ path: ".env.production.local" })
+} else {
+	dotenv.config() // Default to .env for development
+}
+
 async function runSeed() {
 	const dataSource = new DataSource({
 		type: "postgres",
@@ -14,7 +23,8 @@ async function runSeed() {
 		username: process.env.DATABASE_USERNAME,
 		password: String(process.env.DATABASE_PASSWORD),
 		database: process.env.DATABASE_NAME,
-		entities: [Task, TaskPriorityStatus]
+		entities: [Task, TaskPriorityStatus],
+		synchronize: process.env.NODE_ENV !== "production" // only for local environment
 	})
 
 	// Initialize the data source
@@ -28,7 +38,7 @@ async function runSeed() {
 		await new CreateTaskPriorityStatuses().run(null, dataSource)
 		await new CreateTasks().run(null, dataSource)
 
-		console.log("Seeding complete!") // eslint-disable-line no-console
+		console.log("Seeding complete!\n") // eslint-disable-line no-console
 	} catch (error) {
 		console.error("Error during seeding:", error) // eslint-disable-line no-console
 	} finally {
@@ -36,8 +46,6 @@ async function runSeed() {
 		await dataSource.destroy()
 	}
 }
-
-dotenv.config()
 
 // Execute the seed function
 runSeed()
