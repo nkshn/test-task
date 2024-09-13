@@ -21,7 +21,6 @@ The project leverages the following technologies:
   - [x] CRUD operations for **Tasks**
     - [x] Customizing the sorting for getting all **Tasks**
   - [x] CRUD operations for **Task Priority Status**
-
 - [x] **Caching** – Efficient caching for task retrieval using Redis.
 - [x] **Logger** – Logs requests, cache hits/misses, and errors.
 - [x] **API Documentation** – Swagger integrated for easy API exploration.
